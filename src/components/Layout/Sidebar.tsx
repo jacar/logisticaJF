@@ -59,11 +59,11 @@ const Sidebar: React.FC = () => {
   const routes = getRoutes();
 
   return (
-    <div className="w-64 bg-gradient-to-b from-primary-800 to-primary-900 min-h-screen">
-      <div className="p-4">
+    <div className="w-64 bg-gradient-to-b from-primary-800 to-primary-900 min-h-screen sidebar-mobile">
+      <div className="p-2 sm:p-4">
         {/* Mostrar información del usuario */}
-        <div className="mb-6 p-3 bg-primary-700/50 rounded-lg border border-primary-600/30">
-          <p className="text-white text-sm font-medium">{user?.name}</p>
+        <div className="mb-4 sm:mb-6 p-2 sm:p-3 bg-primary-700/50 rounded-lg border border-primary-600/30">
+          <p className="text-white text-xs sm:text-sm font-medium">{user?.name}</p>
           <p className="text-primary-200 text-xs">
             {user?.role === 'root' ? 'Super Administrador' : 
              user?.role === 'admin' ? 'Administrador' : 'Conductor'}
@@ -78,14 +78,14 @@ const Sidebar: React.FC = () => {
                 key={route.path}
                 to={route.path}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                  `flex items-center space-x-2 sm:space-x-3 px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
                     isActive
                       ? (user?.role === 'conductor' ? 'bg-green-600 text-white shadow-lg' : 'bg-secondary-600 text-white shadow-lg')
                       : 'text-primary-200 hover:text-white hover:bg-primary-700/50'
                   }`
                 }
               >
-                <Icon className="h-5 w-5" />
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span>{route.name}</span>
               </NavLink>
             );

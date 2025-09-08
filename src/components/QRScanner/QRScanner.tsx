@@ -11,20 +11,36 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
   const [error, setError] = useState<string>('');
+  const [isScanning, setIsScanning] = useState(false);
+  const lastScanTime = useRef<number>(0);
 
   useEffect(() => {
     const startCamera = async () => {
-      if (!videoRef.current) return;
+      if (!videoRef.current || qrScannerRef.current) return;
 
       try {
         qrScannerRef.current = new QrScanner(
           videoRef.current,
           (result) => {
+            // Prevenir escaneos duplicados en menos de 2 segundos
+            const now = Date.now();
+            if (now - lastScanTime.current < 2000) {
+              return;
+            }
+            lastScanTime.current = now;
+            
+            setIsScanning(true);
             onScan(result.data);
+            
+            // Cerrar el scanner después del escaneo exitoso
+            setTimeout(() => {
+              onClose();
+            }, 1000);
           },
           {
             highlightScanRegion: true,
             highlightCodeOutline: true,
+            maxScansPerSecond: 1, // Limitar a 1 escaneo por segundo
           }
         );
 
@@ -40,9 +56,10 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
     return () => {
       if (qrScannerRef.current) {
         qrScannerRef.current.destroy();
+        qrScannerRef.current = null;
       }
     };
-  }, [onScan]);
+  }, [onScan, onClose]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
@@ -77,8 +94,13 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
             />
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-600">
-                Apunte la cámara hacia el código QR del pasajero
+                {isScanning ? 'Procesando...' : 'Apunte la cámara hacia el código QR del pasajero'}
               </p>
+              {isScanning && (
+                <div className="mt-2">
+                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                </div>
+              )}
             </div>
           </div>
         )}
